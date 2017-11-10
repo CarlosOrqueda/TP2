@@ -44,10 +44,10 @@ def buscar_id():
           while id != 'end':
                     id_anterior=id
                     id,nombre,fecha,peliculas,estado = leer_usuario(arch_user)
-          dato=int(id_anterior[1:4])
-          valor=dato+1
-          valor=id_anterior[0]+str(valor)
-          return valor
+          vocal= chr(ord(id_anterior[0])+1)
+          num=str(int(id_anterior[1:4])+1)
+          nuevo_id=vocal+num
+          return nuevo_id
           
 def alta_user():
           id=buscar_id()
