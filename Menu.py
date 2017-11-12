@@ -1,5 +1,7 @@
 import Funciones_Usuarios
 import Funciones_Peliculas
+import Funciones_Recomendaciones
+
 ########## MENUS Y SUB MENUS ##################
 
 def menu_principal():
@@ -64,6 +66,17 @@ def sub_menu_user():
         enter = input("Opcion Incorrecta, enter para continuar ...")
         sub_menu_user()
     sub_menu_user()
+
+
+def sub_menu_recomendaciones():
+    palabra = "Sub Menu Recomendadas."
+    print(palabra.center(50, "*"))
+    print("1) Top 5 por Genero. \n2)Recomendacion por Usuario.")
+    opc = input("Opcion: ")
+    if opc == '1':
+        Funciones_Recomendaciones.top_x_genero()
+    elif opc == '2':
+        Funciones_Recomendaciones.peli_recomendada()
 
 
 ######## BLOQUE PRINCIPAL ############
