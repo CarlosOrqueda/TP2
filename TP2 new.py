@@ -1,6 +1,7 @@
 user1=open("usuarios1.csv","r")
 user2=open("usuarios2.csv","r")
 user3=open("usuarios3.csv","r")
+import pickle
 ########### LEER ARCHIVO ##############
 def linea_archivo(arch,default):
           linea=arch.readline()
@@ -39,41 +40,41 @@ def merge():
                     sub_menu_user()
 ############### ALTA DE USUARIO #######################                    
 def buscar_id():
-          arch_user=open("usuario_maestro.bin","r")
-          id,nombre,fecha,peliculas,estado = leer_usuario(arch_user)
-          while id != 'end':
+      arch_user=open("usuario_maestro.bin","r")
+      id,nombre,fecha,peliculas,estado = leer_usuario(arch_user)
+      while id != 'end':
                     id_anterior=id
                     id,nombre,fecha,peliculas,estado = leer_usuario(arch_user)
-          num=int(id_anterior[1:4])
-          if num > 999:
+                    
+      num=int(id_anterior[1:4])
+      if num < 999:
                 vocal= id_anterior[0]
                 num+= 1
                 nuevo_id = vocal + str(num)
-          elif num == 999:
+      elif num == 999:
                 vocal= chr(ord(id_anterior[0])+1)
                 num=100
-                nuevo_id= vocal + str(num)
-          else:
-                vocal= id_anterior[0]
-                num += 1
-                nuevo_id=vocal+ str(num)
-                
-          arch_user.close()
-          return nuevo_id
+                nuevo_id= vocal + str(num)                
+      arch_user.close()
+      return nuevo_id
           
 def alta_user():
           id=buscar_id()
           arch_user=open("usuario_maestro.bin","r+")
           arch_user.readlines()
+          
           nombre=input('Nombre y Apellido: ')
           fecha=input('Fecha de nacimiento ddmmaaaa: ')
           peliculas=' '
           estado = 'a'
           grabar_usuario(arch_user,id,nombre,fecha,peliculas,estado)
+          
           print("Usuario dado de alta satisfactoriamente.")
           enter=input("Enter para continuar ...")
+          
           arch_user.close()
           sub_menu_user()
+          
 ############ BAJA DE USUARIO ###################
 def buscar_posicion(buscado):
       arch=open("usuario_maestro.bin","r")
@@ -106,6 +107,141 @@ def mostrar_listado():
           arch.close()
           enter=input("Enter para continuar ...")
           sub_menu_user()
+          
+########## AlTAS DE PELICULAS ###############
+def ultimo_id(): #### busca el ultimo id de las peliculas
+      lista=[]
+      file=open("archivo_peliculas.bin","rb")
+
+      seguir =True  
+      while seguir:
+            try:
+                  lista=pickle.load(file)
+            except EOFError:
+                  seguir=False
+      ide=lista[0]
+      file.close()
+      return ide
+
+def genera_id_pelicula(): ## genera el id subsiguiente al ultimo de las peliculas
+      
+      ide=ultimo_id()            
+      numero=int(ide[2:5])
+      numero_ant=numero
+      letra=ide[0:2]
+      if numero<999 :
+            numero+=1
+      else: 
+            numero=0
+            numero=str(numero).zfill(3)
+            
+            dere=ide[1]
+            izqui=ide[0]
+            
+            if dere == "z" and numero_ant==999:
+                  dere="a"
+                  letra=chr(ord(izqui)+1)+dere
+            else:
+                  letra=izqui+chr(ord(dere)+1)
+                
+            
+      id_pelicula=letra+str(numero).zfill(3)
+      return id_pelicula
+
+def pedir_datos(): ### carga de datos de la pelicula
+
+      pelicula=[]
+      id_pelicula=genera_id_pelicula()
+      titulo=input("Titulo: ")
+      director=input("Director: ")
+      genero=input("Genero: ")
+      puntaje=input("Puntaje: ")
+      pelicula=[id_pelicula,titulo,director,genero,puntaje]
+      return pelicula
+      
+def alta_pelicula():  ##alta de una pelicula de un archivo ya creado
+
+      
+      file = open("archivo_peliculas.bin","rb+")
+      file.seek(0,2)
+      lista=pedir_datos()
+      pickle.dump(lista,file)
+      file.close()
+      enter=input("Enter para continuar ...")      
+      sub_menu_peliculas()
+          
+############# BAJA DE PELICULAS ##############
+def cargar_al_archivo(dic):
+
+      file=open("archivo_peliculas.bin","wb")
+      
+      for clave in dic:
+            lista=[clave,dic[clave][0],dic[clave][1],dic[clave][2],dic[clave][3]]
+            pickle.dump(lista,file)
+      file.close()
+
+def mostrar_peliculas():
+      
+      file=open("archivo_peliculas.bin","rb")
+      seguir =True  ## con este codigo evito poner todos los .load de cada pickle##
+      print("CODIGO     PELICULA")
+      while seguir:
+            try:
+                  elem=pickle.load(file)
+            except EOFError:
+                  seguir=False
+            else:
+                  print(elem[0].ljust(10),elem[1],end='\n')
+      file.close()
+
+def baja_pelicula():
+      dic={}
+      file1=open("archivo_peliculas.bin","rb")
+      seguir =True  
+      while seguir:
+            try:
+                  lista=pickle.load(file1)
+                  dic[lista[0]]=[lista[1],lista[2],lista[3],lista[4]]     
+            except EOFError:
+                  seguir=False
+      file1.close()
+      mostrar_peliculas()
+
+      codigo_pelicula=input("ingrese el codigo de la pelicula a dar de baja: ")
+      del dic[codigo_pelicula]
+      
+      cargar_al_archivo(dic)
+      enter=input("Enter para continuar ...")      
+      sub_menu_peliculas()
+      
+######## MOSTAR PELICULAS POR PUNTAJE #######
+def carga_lista():
+      
+      lista=[]
+      file1=open("archivo_peliculas.bin","rb")
+      seguir =True  
+      while seguir:
+            try:
+                  l=pickle.load(file1)
+                  lista.append({'ide':l[0],'titulo':l[1],'director':l[2],'genero':l[3],'puntaje':l[4]})     
+            except EOFError:
+                  seguir=False
+      
+      return lista
+
+def mostrar_lista(lista):
+         print("      {}              {}       {}".format('PELICULA'.ljust(22),'PUNTAJE'.ljust(12),'GENERO'))
+         for pelicula in lista:
+               print(pelicula['titulo'].ljust(50),pelicula['puntaje'].ljust(10),pelicula['genero'].rjust(20))
+
+
+
+def pelicula_por_puntaje():
+      lista=carga_lista()
+      lista.sort(key=lambda x:(x['puntaje'],x['genero']), reverse=True)
+      mostrar_lista(lista)
+      enter=input("Enter para continuar ...")      
+      sub_menu_peliculas()
 ########## SUB MENUS ##################
 def sub_menu_peliculas():
             palabra="Sub Menu Peliculas."
@@ -122,9 +258,9 @@ def sub_menu_peliculas():
             elif opc == '2':
                   baja_pelicula()
             elif opc == '3':
-                  peliculas_puntaje()
+                  pelicula_por_puntaje()
             elif opc == '4':
-                  peliculas_genero()
+                  pelicula_genero()
             elif opc == '5':
                   asignar_pelicula()
             elif opc == '6':
