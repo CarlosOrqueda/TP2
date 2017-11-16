@@ -24,7 +24,7 @@ def grabar_usuario(arch, id, nombre, fecha, peliculas_vistas, estado):
 ####################################
 
 def merge():
-    user_m = open("usuario_maestro.csv", "w")
+    user_m = open("usuario_maestro.bin", "w")
     id1, nombre1, fecha1, peliculas1, estado1 = leer_usuario(user1)
     id2, nombre2, fecha2, peliculas2, estado2 = leer_usuario(user2)
     id3, nombre3, fecha3, peliculas3, estado3 = leer_usuario(user3)
@@ -45,22 +45,29 @@ def merge():
     user_m.close()
 
 
-
 def buscar_id():
-    arch_user = open("usuario_maestro.csv", "r+")
+    arch_user = open("usuario_maestro.bin", "r")
     id, nombre, fecha, peliculas, estado = leer_usuario(arch_user)
     while id != 'end':
         id_anterior = id
         id, nombre, fecha, peliculas, estado = leer_usuario(arch_user)
-    vocal = chr(ord(id_anterior[0]) + 1)
-    num = str(int(id_anterior[1:4]) + 1)
-    nuevo_id = vocal + num
+
+    num = int(id_anterior[1:4])
+    if num < 999:
+        vocal = id_anterior[0]
+        num += 1
+        nuevo_id = vocal + str(num)
+    elif num == 999:
+        vocal = chr(ord(id_anterior[0]) + 1)
+        num = 100
+        nuevo_id = vocal + str(num)
+    arch_user.close()
     return nuevo_id
 
 
 def alta_user():
     id = buscar_id()
-    arch_user = open("usuario_maestro.csv", "r+")
+    arch_user = open("usuario_maestro.bin", "r+")
     arch_user.readlines()
     nombre = input('Nombre y Apellido: ')
     fecha = input('Fecha de nacimiento ddmmaaaa: ')
@@ -72,23 +79,22 @@ def alta_user():
     arch_user.close()
 
 
+def buscar_posicion(buscado, arch):
+    id, nombre, fecha, peliculas, estado = leer_usuario(arch)
+    while nombre != buscado:
+        pos = arch.tell()
+        id, nombre, fecha, peliculas, estado = leer_usuario(arch)
+    return pos, id, nombre, fecha, peliculas
+
 def baja_user():
-    user_m = open("usuario_maestro.csv", "r")
-    nombre_a_bajar = input('Ingrese nombre: ')
-    baja = 'b'
-    actualizado = open("usuarios_actualizados.csv", "w")
-    id, nombre, fecha, peliculas, estado = leer_usuario(user_m)
-    while id != 'end':
-        if nombre == nombre_a_bajar:
-            grabar_usuario(actualizado, id, nombre, fecha, peliculas, baja)
-            print("Usuario dado de baja.")
-            id, nombre, fecha, peliculas, estado = leer_usuario(user_m)
-        else:
-            grabar_usuario(actualizado, id, nombre, fecha, peliculas, estado)
-            id, nombre, fecha, peliculas, estado = leer_usuario(user_m)
+    arch = open("usuario_maestro.bin", "r+")
+    buscado = input('Ingrese nombre: ')
+    pos, id, nombre, fecha, peliculas = buscar_posicion(buscado, arch)
+    arch.seek(pos)
+    grabar_usuario(arch, id, nombre, fecha, peliculas, 'b')
+    print("Usuarios dado de Baja Satisfactoriamente.")
     enter = input("Enter para continuar ...")
-    user_m.close()
-    actualizado.close()
+    arch.close()
 
 
 def mostrar_listado():
