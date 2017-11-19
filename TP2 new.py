@@ -1,6 +1,3 @@
-user1=open("usuarios1.csv","r")
-user2=open("usuarios2.csv","r")
-user3=open("usuarios3.csv","r")
 import pickle
 ########### LEER ARCHIVO ##############
 def linea_archivo(arch,default):
@@ -13,18 +10,38 @@ def leer_usuario(arch):
           return id,nombre,fecha,peliculas,estado
 
 ########## GRABAR ARCHIVO ############          
-def grabar_usuario(arch,id,nombre,fecha,peliculas_vistas,estado):
-          arch.write(id+','+nombre+','+fecha+','+peliculas_vistas+','+estado+'\n')
+def grabar_usuario(arch,id,nombre,fecha,peliculas,estado):
+          arch.write(id+','+nombre+','+fecha+','+peliculas+','+estado+'\n')
           
 ####################################
-def merge():
-                    user_m=open("usuario_maestro.bin","w") 
+def verifcarDatos():
+      errores=open("long.txt","r+")
+      if nombre1 == nombre2:
+            if fecha1 != fecha2:
+                  grabarError(nombre1,peliculas1,peliculas2)
+
+
+      elif  nombre2 == nombre3:
+            if fecha2 != fecha3:
+                  grabarEror(nombre2,peliculas2,peliculas3)
+
+      elif nombre3 == nombre1 :
+            if fecha3 != fecha2:
+                  grabarError(nombre3,peliculas3,peliculas1)
+            
+def merge(): #AGREGE ACA
+                    user1=open("usuarios1.csv","r")
+                    user2=open("usuarios2.csv","r")
+                    user3=open("usuarios3.csv","r")                    
+                    user_m=open("usuario_maestro.bin","w")
+                    
                     id1,nombre1,fecha1,peliculas1,estado1 = leer_usuario(user1)
                     id2,nombre2,fecha2,peliculas2,estado2 = leer_usuario(user2)
                     id3,nombre3,fecha3,peliculas3,estado3 = leer_usuario(user3)
 
                     while id1 != 'end' or id2 != 'end' or id3 != 'end':
                               menor = min(id1,id2,id3)
+                              verificarDatos(nombre1,nombre2,nombre3)
                               if id1 == menor:
                                         grabar_usuario(user_m,id1,nombre1,fecha1,peliculas1,estado1)
                                         id1,nombre1,fecha1,peliculas1,estado1 = leer_usuario(user1)
@@ -38,41 +55,57 @@ def merge():
                     enter=input("Enter para continuar ...")
                     user_m.close()
                     sub_menu_user()
-############### ALTA DE USUARIO #######################                    
-def buscar_id():
-      arch_user=open("usuario_maestro.bin","r")
-      id,nombre,fecha,peliculas,estado = leer_usuario(arch_user)
-      while id != 'end':
-                    id_anterior=id
-                    id,nombre,fecha,peliculas,estado = leer_usuario(arch_user)
+############### ALTA DE USUARIO #######################
+def   validoArchivo(): #AGREGE ACA
+      try:
+            arch=open("usuario_maestro.bin","r+")
+            valido=True
+      except:
+            arch=open("usuario_maestro.bin","w")
+            valido=False
+      return arch,valido
                     
-      num=int(id_anterior[1:4])
-      if num < 999:
+def buscar_id():  #MODIFIQUE
+      arch,valido=validoArchivo()
+      if valido == False:
+            vocal='a'
+            num='100'
+            nuevo_id=vocal+num
+            
+      elif valido == True:
+            id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+            while id != 'end':
+                    id_anterior=id
+                    id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+                    
+            num=int(id_anterior[1:4])
+            if num < 999:
                 vocal= id_anterior[0]
                 num+= 1
                 nuevo_id = vocal + str(num)
-      elif num == 999:
+            elif num == 999:
                 vocal= chr(ord(id_anterior[0])+1)
                 num=100
-                nuevo_id= vocal + str(num)                
-      arch_user.close()
+                nuevo_id= vocal + str(num)
+
+      
       return nuevo_id
           
 def alta_user():
           id=buscar_id()
-          arch_user=open("usuario_maestro.bin","r+")
-          arch_user.readlines()
+          arch=open("usuario_maestro.bin","r+")
+          arch.seek(0,2)
           
           nombre=input('Nombre y Apellido: ')
           fecha=input('Fecha de nacimiento ddmmaaaa: ')
           peliculas=' '
           estado = 'a'
-          grabar_usuario(arch_user,id,nombre,fecha,peliculas,estado)
+          grabar_usuario(arch,id,nombre,fecha,peliculas,estado)
           
           print("Usuario dado de alta satisfactoriamente.")
           enter=input("Enter para continuar ...")
           
-          arch_user.close()
+          arch.close()
           sub_menu_user()
           
 ############ BAJA DE USUARIO ###################
@@ -215,8 +248,7 @@ def baja_pelicula():
       sub_menu_peliculas()
       
 ######## MOSTAR PELICULAS POR PUNTAJE #######
-def carga_lista():
-      
+def carga_lista():      
       lista=[]
       file1=open("archivo_peliculas.bin","rb")
       seguir =True  
@@ -232,9 +264,7 @@ def carga_lista():
 def mostrar_lista(lista):
          print("      {}              {}       {}".format('PELICULA'.ljust(22),'PUNTAJE'.ljust(12),'GENERO'))
          for pelicula in lista:
-               print(pelicula['titulo'].ljust(50),pelicula['puntaje'].ljust(10),pelicula['genero'].rjust(20))
-
-
+               print(pelicula['titulo'].ljust(25),pelicula['puntaje'].ljust(10),pelicula['genero'].rjust(20))
 
 def pelicula_por_puntaje():
       lista=carga_lista()
@@ -242,6 +272,109 @@ def pelicula_por_puntaje():
       mostrar_lista(lista)
       enter=input("Enter para continuar ...")      
       sub_menu_peliculas()
+      
+############ PROMEDIO DE PUNTAJES DE LAS PELICULAS #####
+
+def carga_lista(): # SE REPITE  EN MOSTAR PELI POR PUNTAJE SI LO QUITO ME TIRA ERROR
+      
+      lista=[]
+      file1=open("archivo_peliculas.bin","rb")
+      seguir =True  
+      while seguir:
+            try:
+                  l=pickle.load(file1)
+                  lista.append(l)     
+            except EOFError:
+                  seguir=False
+      return lista
+
+def leer_archivo_binario(file_film):
+      try:
+            lista =pickle.load(file_film)
+            return lista
+      except EOFError:
+            lista=[" "," "," "," ",0]
+            return lista
+
+      
+def mostrar_lista_cortecontrol():
+      
+      with open("archivo_peliculas_aux.bin","rb") as file_film:
+            lista=leer_archivo_binario(file_film)
+            director,genero,puntaje=lista[2],lista[3],lista[4]
+
+            total_peliculas=0
+            while genero != ' ':
+                  total_genero=0
+                  contador_genero=0
+                  genero_anterior=genero
+                  print("Genero:",genero.upper())
+                  while genero != ' ' and genero == genero_anterior:
+                        total_puntaje=0
+                        contador_director=0
+                        director_anterior=director
+                        while genero != ' ' and genero == genero_anterior and director_anterior == director:
+                              total_puntaje +=int(puntaje)
+                              contador_director+=1
+                              lista=leer_archivo_binario(file_film)
+                              director,genero,puntaje=lista[2],lista[3],lista[4]
+                        print("promedio de puntaje director: {} es {:.2f}".format(director_anterior,float(total_puntaje/contador_director)))
+                        total_genero+=total_puntaje
+                        contador_genero+=contador_director
+                  
+                  print("promedio por {} es {:.2f}".format(genero_anterior,float(total_genero/contador_genero)))
+                  print(" ")
+
+
+def carga_lista_archivo(lista):
+
+      lista_aux=[]
+      file=open('archivo_peliculas_aux.bin',"wb")
+      for campo in lista:
+            pickle.dump(campo,file)
+      file.close()
+
+
+def pelis_por_genero():
+      print("PROMEDIO POR GENERO-DIRECTOR")
+      lista=carga_lista()
+      lista.sort(key=lambda x:(x[3],x[2]))
+      carga_lista_archivo(lista)
+      mostrar_lista_cortecontrol()
+     
+      
+############ASIGNAR PELICULA A USUARIO##############
+def verifico(eleccion,pelicula,lista): #AGREGE
+          aux=pelicula.split(';')
+          if eleccion not in aux:
+                    aux.append(eleccion)
+                    lista.append(aux)
+                    
+                    return True
+          return False
+         
+def asignar_pelicula(): #AGREGE
+      usuario=input("Ingrese nombre de usuario: ")
+      pos,id,nombre,fecha,peliculas=buscar_posicion(usuario)
+      lista=[]
+      seguir = 's'
+      mostrar_peliculas()  
+      while seguir == 's':                     
+                    eleccion=input("Ingrese Codigo de Pelicula : ")                    
+                    if verifico(eleccion,peliculas,lista):
+                              enter=input("Pelicula agregada correctamente...   enter para continuar.")
+                              seguir= 'n'
+                    else:
+                              print("Pelicula ya esta en su Usuario")
+                              seguir = 's'                       
+      unir = ";"
+      agregar=unir.join(lista[0])
+      arch=open("usuario_maestro.bin","r+")
+      arch.seek(pos)
+      grabar_usuario(arch,id,nombre,fecha,agregar,'a')
+      arch.close()
+      sub_menu_peliculas()
+           
 ########## SUB MENUS ##################
 def sub_menu_peliculas():
             palabra="Sub Menu Peliculas."
@@ -260,7 +393,7 @@ def sub_menu_peliculas():
             elif opc == '3':
                   pelicula_por_puntaje()
             elif opc == '4':
-                  pelicula_genero()
+                  pelis_por_genero() #CAMBIE ACA
             elif opc == '5':
                   asignar_pelicula()
             elif opc == '6':
@@ -270,9 +403,10 @@ def sub_menu_peliculas():
                   sub_menu_peliculas()
             
 def sub_menu_user():
+            errores=open("long.txt","w")
             palabra="Sub Menu Usuarios."
             print(palabra.center(50,"*"))
-            print("1) Merge.")
+            print("1) Generar Archivo.") #CAMBIE
             print("2) Alta de Usuario.")
             print("3) Baja de Usuario.")
             print("4) Listas los Usuarios.")
@@ -282,7 +416,7 @@ def sub_menu_user():
             if opc == '1':
                   merge()
             elif opc == '2':
-                  alta_user()
+                  alta_user() 
             elif opc == '3':
                   baja_user()
             elif opc == '4':
@@ -292,7 +426,9 @@ def sub_menu_user():
             else:
                   enter=input("Opcion Incorrecta, enter para continuar ...")
                   sub_menu_user()
+                  
 def menu_principal():
+            
             salir = False
             palabra='  Bienvenido a NetFlip  '
             print(palabra.center(50,"*"))
@@ -302,7 +438,7 @@ def menu_principal():
             print("4) Salir.")
             opc = input("Opcion: ")
             if opc == '1':
-                  sub_menu_user()
+                  sub_menu_user() 
             elif opc == '2':
                   sub_menu_peliculas()
             elif opc == '3':
@@ -312,6 +448,7 @@ def menu_principal():
             else:
                   enter=input("Opcion Incorrecta, enter para continuar ...")
                   menu_principal()
+                  
 ######## BLOQUE PRINCIPAL ############                  
 menu_principal()
             
