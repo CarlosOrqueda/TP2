@@ -13,22 +13,34 @@ def leer_usuario(arch):
 def grabar_usuario(arch,id,nombre,fecha,peliculas,estado):
           arch.write(id+','+nombre+','+fecha+','+peliculas+','+estado+'\n')
           
-####################################
+###################################
+def grabarError(arch,nombre,dato1,dato2):
+          lista=dato1.split(";")
+          aux=dato2.split(";")
+          for campo in aux:
+                    if campo not in aux:
+                              lista.aapend(aux)
+          unir=';'
+          pelis=unir.join(lista)
+          arch.write(nombre + ',' + pelis  + '\n')
+          
 def verifcarDatos():
       errores=open("long.txt","r+")
       if nombre1 == nombre2:
             if fecha1 != fecha2:
-                  grabarError(nombre1,peliculas1,peliculas2)
+                  grabarError(errores,nombre1,peliculas1,peliculas2)
 
 
       elif  nombre2 == nombre3:
             if fecha2 != fecha3:
-                  grabarEror(nombre2,peliculas2,peliculas3)
+                  grabarEror(errores,nombre2,peliculas2,peliculas3)
 
       elif nombre3 == nombre1 :
             if fecha3 != fecha2:
-                  grabarError(nombre3,peliculas3,peliculas1)
-            
+                  grabarError(errores,nombre3,peliculas3,peliculas1)
+
+
+          
 def merge(): #AGREGE ACA
                     user1=open("usuarios1.csv","r")
                     user2=open("usuarios2.csv","r")
@@ -41,7 +53,7 @@ def merge(): #AGREGE ACA
 
                     while id1 != 'end' or id2 != 'end' or id3 != 'end':
                               menor = min(id1,id2,id3)
-                              verificarDatos(nombre1,nombre2,nombre3)
+                              #verificarDatos(nombre1,nombre2,nombre3)
                               if id1 == menor:
                                         grabar_usuario(user_m,id1,nombre1,fecha1,peliculas1,estado1)
                                         id1,nombre1,fecha1,peliculas1,estado1 = leer_usuario(user1)
@@ -341,6 +353,8 @@ def pelis_por_genero():
       lista.sort(key=lambda x:(x[3],x[2]))
       carga_lista_archivo(lista)
       mostrar_lista_cortecontrol()
+      enter=input("Enter para continuar ...")
+      sub_menu_peliculas()
      
       
 ############ASIGNAR PELICULA A USUARIO##############
@@ -374,7 +388,93 @@ def asignar_pelicula(): #AGREGE
       grabar_usuario(arch,id,nombre,fecha,agregar,'a')
       arch.close()
       sub_menu_peliculas()
-           
+################# RECOMENDACIONES##############
+def puntoFinal():
+          dic={}
+          arch=open("archivo_peliculas.bin","rb")
+          lista=leer_archivo_binario(arch)
+          cod,nombrePelicula = lista[0],lista[1]
+          while cod != " ":
+                    dic[cod] = nombrePelicula
+                    lista=leer_archivo_binario(arch)
+                    cod,nombrePelicula = lista[0],lista[1]
+
+          return dic
+
+def convertir(dic):
+          aux=[]
+          dicAux={}
+          for clave in dic:
+                    campo=[clave,dic[clave]]
+                    aux.append(campo)
+                    
+          aux.sort(key=lambda x:x[1],reverse=True)
+          
+          for campo in aux:
+                    dicAux[campo[0]]=campo[1]
+                    
+          return dicAux
+                    
+          
+def peliculasVistas(dic):
+          aux={}
+          arch=open("usuario_maestro.bin","r")
+          id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+          lista=peliculas.split(";")
+
+          while id !='end':
+                    for cod in lista:
+                              nombrePeli =dic[cod]
+                              if nombrePeli not in aux:
+                                        aux[nombrePeli]= 1
+                              else:
+                                        aux[nombrePeli] += 1
+                    id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+                    lista=peliculas.split(";")
+          aux=convertir(aux)
+          return aux
+
+def recomendarPelis(peliculas,pelisVistas,dic):
+          lista=peliculas.split(";")
+          ultimo=lista[-1]
+          ultimo=dic[ultimo]
+          cant=pelisVistas[ultimo]
+
+          for clave in pelisVistas:
+                    if pelisVistas[clave] <= cant:
+                              return clave,pelisVistas[clave]
+                    
+def recomendar_pelicula():
+          dic=puntoFinal()
+          pelisVistas=peliculasVistas(dic)
+          user=input("Ingrese Nomre de Usuario : ")
+          pos,id,nombre,fecha,peliculas=buscar_posicion(user)
+          nombrePeli,cant= recomendarPelis(peliculas,pelisVistas,dic)
+          print("La Recomendacion es {} que fue vistas {} veces.".format(nombrePeli,cant))
+          enter=input("Enter para continuar ....")
+          sub_menu_recomendaciones()
+          
+          
+########### SUB MENU RECOMENDACIONES ########
+def sub_menu_recomendaciones():
+          palabra="Sub Menu Recomendaciones."
+          print(palabra.center(50,"*"))
+          print("1) Recomendar las 5 Peliculas  mas vistas por Genero.")
+          print("2) Recomendarte Pelicula.")
+          print("3) Volver al menu principal")
+          opc = input("Opcion: ")
+
+          if opc== '1':
+                    recomendar_generos()
+          elif opc == '2':
+                    recomendar_pelicula()
+          elif opc == '3':
+                    menu_principal()
+          else:
+                    enter=input("Opcion incorrecta .. enter para continuar")
+                    sub_menu_recomendaciones()
+                    
+          
 ########## SUB MENUS ##################
 def sub_menu_peliculas():
             palabra="Sub Menu Peliculas."
