@@ -1,6 +1,7 @@
-import Funciones_Usuarios
-import Funciones_Peliculas
-import Funciones_Recomendaciones
+import Usuarios
+import Peliculas
+import Recomendaciones
+
 
 ########## MENUS Y SUB MENUS ##################
 
@@ -29,15 +30,15 @@ def sub_menu_peliculas():
           "\n5) Asignar Pelicula a Usuario. \n6) Volver al Menu Principal.")
     opc = input("Opcion: ")
     if opc == '1':
-        Funciones_Peliculas.alta_pelicula()
+        Peliculas.alta_peli()
     elif opc == '2':
-        Funciones_Peliculas.baja_pelicula()
+        Peliculas.baja_peli()
     elif opc == '3':
-        peliculas_puntaje()
+        Peliculas.pelicula_por_puntaje()
     elif opc == '4':
-        peliculas_genero()
+        Peliculas.pelis_por_genero()
     elif opc == '5':
-        asignar_pelicula()
+        Peliculas.pelicula_por_puntaje()
     elif opc == '6':
         menu_principal()
     else:
@@ -53,13 +54,13 @@ def sub_menu_user():
           "\n5) Volver al Menu Principal.")
     opc = input("Opcion: ")
     if opc == '1':
-        Funciones_Usuarios.merge()
+        Usuarios.merge()
     elif opc == '2':
-        Funciones_Usuarios.alta_user()
+        Usuarios.alta_usu()
     elif opc == '3':
-        Funciones_Usuarios.baja_user()
+        Usuarios.baja_usu()
     elif opc == '4':
-        Funciones_Usuarios.mostrar_listado()
+        Usuarios.listado_usu()
     elif opc == '5':
         menu_principal()
     else:
@@ -74,9 +75,9 @@ def sub_menu_recomendaciones():
     print("1) Top 5 por Genero. \n2)Recomendacion por Usuario.")
     opc = input("Opcion: ")
     if opc == '1':
-        Funciones_Recomendaciones.top_x_genero()
+        Recomendaciones.top_x_genero()
     elif opc == '2':
-        Funciones_Recomendaciones.peli_recomendada()
+        Recomendaciones.recomendar_pelicula()
 
 
 ######## BLOQUE PRINCIPAL ############
