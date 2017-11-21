@@ -24,7 +24,7 @@ def grabarError(arch,nombre,dato1,dato2):
           pelis=unir.join(lista)
           arch.write(nombre + ',' + pelis  + '\n')
           
-def verifcarDatos():
+def verificarDatos(nombre1,fecha1,peliculas1,nombre2,fecha2,peliculas2,nombre3,fecha3,peliculas3):
       errores=open("long.txt","r+")
       if nombre1 == nombre2:
             if fecha1 != fecha2:
@@ -53,7 +53,7 @@ def merge(): #AGREGE ACA
 
                     while id1 != 'end' or id2 != 'end' or id3 != 'end':
                               menor = min(id1,id2,id3)
-                              #verificarDatos(nombre1,nombre2,nombre3)
+                              verificarDatos(nombre1,fecha1,peliculas1,nombre2,fecha2,peliculas2,nombre3,fecha3,peliculas3)
                               if id1 == menor:
                                         grabar_usuario(user_m,id1,nombre1,fecha1,peliculas1,estado1)
                                         id1,nombre1,fecha1,peliculas1,estado1 = leer_usuario(user1)
