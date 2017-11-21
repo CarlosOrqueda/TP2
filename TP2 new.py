@@ -339,8 +339,6 @@ def mostrar_lista_cortecontrol():
 
 
 def carga_lista_archivo(lista):
-
-      lista_aux=[]
       file=open('archivo_peliculas_aux.bin',"wb")
       for campo in lista:
             pickle.dump(campo,file)

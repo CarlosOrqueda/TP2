@@ -72,12 +72,18 @@ def sub_menu_user():
 def sub_menu_recomendaciones():
     palabra = "Sub Menu Recomendadas."
     print(palabra.center(50, "*"))
-    print("1) Top 5 por Genero. \n2)Recomendacion por Usuario.")
+    print("1) Top 5 por Genero. \n2) Recomendacion por Usuario. \n3) Volver al Menu Principal.")
     opc = input("Opcion: ")
     if opc == '1':
         Recomendaciones.top_x_genero()
     elif opc == '2':
         Recomendaciones.recomendar_pelicula()
+    elif opc == '3':
+        menu_principal()
+    else:
+        enter = input("Opcion Incorrecta, enter para continuar ...")
+        sub_menu_recomendaciones()
+    sub_menu_recomendaciones()
 
 
 ######## BLOQUE PRINCIPAL ############
