@@ -14,9 +14,9 @@ def grabar_usu(arch, id, nombre, fecha, peliculas, estado):
 
 
 def merge():
-    usu1 = open("usuario1.csv", "r")
-    usu2 = open("usuario2.csv", "r")
-    usu3 = open("usuario3.csv", "r")
+    usu1 = open("usuarios1.csv", "r")
+    usu2 = open("usuarios2.csv", "r")
+    usu3 = open("usuarios3.csv", "r")
     usu_m = open("usuario_maestro.bin", "w")
 
     id1, nombre1, fecha1, peliculas1, estado1 = leer_usuario(usu1)
