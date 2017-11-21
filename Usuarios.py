@@ -23,19 +23,19 @@ def merge():
     id2, nombre2, fecha2, peliculas2, estado2 = leer_usuario(usu2)
     id3, nombre3, fecha3, peliculas3, estado3 = leer_usuario(usu3)
 
+    verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3)
+
     while id1 != "end" or id2 != "end" or id3 != "end":
         menor = min(id1, id2, id3)
-        verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3)
-        while id1 != 'end' or id2 != 'end' or id3 != 'end':
-            if id1 == menor:
-                grabar_usu(usu_m, id1, nombre1, fecha1, peliculas1, estado1)
-                id1, nombre1, fecha1, peliculas1, estado1 = leer_usuario(usu1)
-            elif id2 == menor:
-                grabar_usu(usu_m, id2, nombre2, fecha2, peliculas2, estado2)
-                id2, nombre2, fecha2, peliculas2, estado2 = leer_usuario(usu2)
-            else:
-                grabar_usu(usu_m, id3, nombre3, fecha3, peliculas3, estado3)
-                id3, nombre3, fecha3, peliculas3, estado3 = leer_usuario(usu3)
+        if id1 == menor:
+            grabar_usu(usu_m, id1, nombre1, fecha1, peliculas1, estado1)
+            id1, nombre1, fecha1, peliculas1, estado1 = leer_usuario(usu1)
+        elif id2 == menor:
+            grabar_usu(usu_m, id2, nombre2, fecha2, peliculas2, estado2)
+            id2, nombre2, fecha2, peliculas2, estado2 = leer_usuario(usu2)
+        else:
+            grabar_usu(usu_m, id3, nombre3, fecha3, peliculas3, estado3)
+            id3, nombre3, fecha3, peliculas3, estado3 = leer_usuario(usu3)
     print("Archivo unificado correctamente")
     enter = input("Presione Enter para continuar...")
     usu_m.close()
@@ -128,7 +128,7 @@ def grabarError(arch, nombre, dato1, dato2):
     aux = dato2.split(";")
     for campo in aux:
         if campo not in aux:
-            lista.aapend(aux)
+            lista.append(aux)
     unir = ';'
     pelis = unir.join(lista)
     arch.write(nombre + ',' + pelis + '\n')
@@ -139,7 +139,6 @@ def verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nom
     if nombre1 == nombre2:
         if fecha1 != fecha2:
             grabarError(errores, nombre1, peliculas1, peliculas2)
-
 
     elif nombre2 == nombre3:
         if fecha2 != fecha3:
