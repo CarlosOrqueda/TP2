@@ -170,7 +170,7 @@ def carga_lista_archivo(lista):
 def pelis_por_genero():
     print("Pomedio Genero/Director")
     lista = carga_lista()
-    lista.sort(key=lambda x: (x[3], x[2]))
+    lista.sort(key=lambda x: (x['director'], x['genero']))
     carga_lista_archivo(lista)
     mostrar_lista_cortedecontrol()
 
@@ -186,15 +186,14 @@ def verifico(cod_peli, pelicula, lista):
 
 def asignar_pelicula():
     usuario = input("Ingrese nombre de usuario: ")
-    pos, id, nombre, fecha, peliculas = Usuarios.buscar_usu(usuario)
+    pos, id, nombre, fecha, peliculas, estado = Usuarios.buscar_usu(usuario)
     lista = []
     seguir = "s"
     mostrar_peliculas()
     while seguir == "s":
-        cod_peli = input("Ingrese codigo de pelicula")
+        cod_peli = input("Ingrese codigo de pelicula: ")
         if verifico(cod_peli, peliculas, lista):
-            enter = input("Pelicula agregada correctamente...   enter para continuar.")
-            seguir = 'n'
+            seguir = input("Cargar otra pelicula s/n: ")
         else:
             print("Pelicula ya esta en su Usuario")
             seguir = 's'

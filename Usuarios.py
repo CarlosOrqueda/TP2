@@ -66,7 +66,7 @@ def crear_id():
     if num < 999:
         vocal = id_anterior[0]
         num += 1
-        nuevo_id = vocal + num
+        nuevo_id = vocal + str(num)
     else:
         vocal = chr(ord(id_anterior[0]) + 1)
         num = "100"
@@ -79,7 +79,6 @@ def alta_usu():
     id = crear_id()
     arch = open("usuario_maestro.bin", "r+")
     arch.seek(0, 2)
-
     nombre = input("Nombre y Apellido: ")
     fecha = input("Fecha de nacimiento ddmmaaaa: ")
     peliculas = " "
@@ -87,7 +86,6 @@ def alta_usu():
     grabar_usu(arch, id, nombre, fecha, peliculas, estado)
     print("Usuario dado de alta satisfactoriamente.")
     enter = input("Enter para continuar...")
-
     arch.close()
 
 

@@ -38,7 +38,7 @@ def sub_menu_peliculas():
     elif opc == '4':
         Peliculas.pelis_por_genero()
     elif opc == '5':
-        Peliculas.pelicula_por_puntaje()
+        Peliculas.asignar_pelicula()
     elif opc == '6':
         menu_principal()
     else:
