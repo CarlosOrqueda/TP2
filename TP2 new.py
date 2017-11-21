@@ -33,7 +33,7 @@ def verificarDatos(nombre1,fecha1,peliculas1,nombre2,fecha2,peliculas2,nombre3,f
 
       elif  nombre2 == nombre3:
             if fecha2 != fecha3:
-                  grabarEror(errores,nombre2,peliculas2,peliculas3)
+                  grabarError(errores,nombre2,peliculas2,peliculas3)
 
       elif nombre3 == nombre1 :
             if fecha3 != fecha2:
