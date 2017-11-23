@@ -33,7 +33,7 @@ def verificarDatos(nombre1,fecha1,peliculas1,nombre2,fecha2,peliculas2,nombre3,f
 
       elif  nombre2 == nombre3:
             if fecha2 != fecha3:
-                  grabarError(errores,nombre2,peliculas2,peliculas3)
+                  grabarEror(errores,nombre2,peliculas2,peliculas3)
 
       elif nombre3 == nombre1 :
             if fecha3 != fecha2:
@@ -110,6 +110,7 @@ def alta_user():
           
           nombre=input('Nombre y Apellido: ')
           fecha=input('Fecha de nacimiento ddmmaaaa: ')
+          print("Su ID es: ",id) #AGREGE
           peliculas=' '
           estado = 'a'
           grabar_usuario(arch,id,nombre,fecha,peliculas,estado)
@@ -129,18 +130,34 @@ def buscar_posicion(buscado):
             id,nombre,fecha,peliculas,estado = leer_usuario(arch)
       arch.close()
       return pos,id,nombre,fecha,peliculas
-            
-def baja_user():
-          buscado=input('Ingrese nombre: ')
-          baja= 'b'
-          pos,id,nombre,fecha,peliculas=buscar_posicion(buscado)
-          arch=open("usuario_maestro.bin","r+")
-          arch.seek(pos)
-          grabar_usuario(arch,id,nombre,fecha,peliculas,'b')
-          print("Usuarios dado de Baja Satisfactoriamente.")
-          enter=input("Enter para continuar ...")
-          arch.close()
-          sub_menu_user()
+
+def formarLista(): #Agrege
+      lista=[]
+      arch=open("usuario_maestro.bin","r")
+      id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+      while id != 'end':
+            lista.append(nombre)
+            id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+      arch.close()
+      return lista
+      
+def baja_user(): #MODIFIQUE
+      listaNombres=formarLista()
+      buscado=input('Ingrese nombre: ')
+      if buscado in listaNombres:
+                baja= 'b'
+                pos,id,nombre,fecha,peliculas=buscar_posicion(buscado)
+                arch=open("usuario_maestro.bin","r+")
+                arch.seek(pos)
+                grabar_usuario(arch,id,nombre,fecha,peliculas,'b')
+                print("Usuarios dado de Baja Satisfactoriamente.")
+                enter=input("Enter para continuar ...")
+                arch.close()
+                sub_menu_user()
+      else:
+                 print("Nombre se encuentra en nuestra Base de datos.")
+                 enter=input("Enter para continuar ...")
+                 baja_user()
 ############ MOSTRAR LISTADO #################
 def mostrar_listado():
           arch=open("usuario_maestro.bin","r")
@@ -339,6 +356,8 @@ def mostrar_lista_cortecontrol():
 
 
 def carga_lista_archivo(lista):
+
+      lista_aux=[]
       file=open('archivo_peliculas_aux.bin',"wb")
       for campo in lista:
             pickle.dump(campo,file)
@@ -448,7 +467,7 @@ def recomendar_pelicula():
           user=input("Ingrese Nomre de Usuario : ")
           pos,id,nombre,fecha,peliculas=buscar_posicion(user)
           nombrePeli,cant= recomendarPelis(peliculas,pelisVistas,dic)
-          print("La Recomendacion es {} que fue vistas {} veces.".format(nombrePeli,cant))
+          print("La Recomendacion es ''{}'' que fue vistas {} veces.".format(nombrePeli,cant))
           enter=input("Enter para continuar ....")
           sub_menu_recomendaciones()
           

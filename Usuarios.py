@@ -99,16 +99,34 @@ def buscar_usu(usu_buscado):
     return pos, id, nombre, fecha, peliculas, estado
 
 
-def baja_usu():
-    usu_buscado = input("Ingrese Nombre: ")
-    baja = "b"
-    pos, id, nombre, fecha, peliculas, estado = buscar_usu(usu_buscado)
-    arch = open("usuario_maestro.bin", "r+")
-    arch.seek(pos)
-    grabar_usu(arch, id, nombre, fecha, peliculas, baja)
-    print("Usuarios dado de Baja Satisfactoriamente.")
-    enter = input("Enter para continuar ...")
+def formarLista():  # Agrege
+    lista = []
+    arch = open("usuario_maestro.bin", "r")
+    id, nombre, fecha, peliculas, estado = leer_usuario(arch)
+    while id != 'end':
+        lista.append(nombre)
+        id, nombre, fecha, peliculas, estado = leer_usuario(arch)
     arch.close()
+    return lista
+
+
+def baja_usu():
+    listaNombres = formarLista()
+    buscado = input('Ingrese nombre: ')
+    if buscado in listaNombres:
+        baja = 'b'
+        pos, id, nombre, fecha, peliculas = buscar_usu(buscado)
+        arch = open("usuario_maestro.bin", "r+")
+        arch.seek(pos)
+        grabar_usu(arch, id, nombre, fecha, peliculas, 'b')
+        print("Usuarios dado de Baja Satisfactoriamente.")
+        enter = input("Enter para continuar ...")
+        arch.close()
+        return
+    else:
+        print("Nombre se encuentra en nuestra Base de datos.")
+        enter = input("Enter para continuar ...")
+        baja_usu()
 
 
 def listado_usu():
