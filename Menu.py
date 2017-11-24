@@ -64,7 +64,7 @@ def sub_menu_user():
     elif opc == '5':
         menu_principal()
     else:
-        enter = input("Opcion Incorrecta, enter para continuar ...")
+        enter = input("Opcion Incorrecta, enter para continuar ... ")
         sub_menu_user()
     sub_menu_user()
 
