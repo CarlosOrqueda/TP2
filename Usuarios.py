@@ -80,11 +80,11 @@ def alta_usu():
     arch = open("usuario_maestro.bin", "r+")
     arch.seek(0, 2)
     nombre = input("Nombre y Apellido: ").lower()
-
     fecha = input("Fecha de nacimiento ddmmaaaa: ")
     peliculas = " "
     estado = "a"
     grabar_usu(arch, id, nombre, fecha, peliculas, estado)
+    print("Su id es: ",id)
     print("Usuario dado de alta satisfactoriamente.")
     enter = input("Enter para continuar...")
     arch.close()
