@@ -106,13 +106,14 @@ def alta_user():
           id=buscar_id()
           arch=open("usuario_maestro.bin","r+")
           arch.seek(0,2)
-          nombre=input('Nombre y Apellido: ').lower()
+          
+          nombre=input('Nombre y Apellido: ')
           fecha=input('Fecha de nacimiento ddmmaaaa: ')
           print("Su ID es: ",id) #AGREGE
           peliculas=' '
           estado = 'a'
           grabar_usuario(arch,id,nombre,fecha,peliculas,estado)
-          print("Su id es: ", id)
+          
           print("Usuario dado de alta satisfactoriamente.")
           enter=input("Enter para continuar ...")
           
@@ -302,7 +303,7 @@ def pelicula_por_puntaje():
       
 ############ PROMEDIO DE PUNTAJES DE LAS PELICULAS #####
 
-def carga_lista(): # SE REPITE  EN MOSTAR PELI POR PUNTAJE SI LO QUITO ME TIRA ERROR
+def cargaLista(): # SE REPITE  EN MOSTAR PELI POR PUNTAJE SI LO QUITO ME TIRA ERROR
       
       lista=[]
       file1=open("archivo_peliculas.bin","rb")
@@ -364,7 +365,7 @@ def carga_lista_archivo(lista):
 
 def pelis_por_genero():
       print("PROMEDIO POR GENERO-DIRECTOR")
-      lista=carga_lista()
+      lista=cargaLista()
       lista.sort(key=lambda x:(x[3],x[2]))
       carga_lista_archivo(lista)
       mostrar_lista_cortecontrol()
@@ -404,6 +405,72 @@ def asignar_pelicula(): #AGREGE
       arch.close()
       sub_menu_peliculas()
 ################# RECOMENDACIONES##############
+def puntoFinal():
+          dic={}
+          arch=open("archivo_peliculas.bin","rb")
+          lista=leer_archivo_binario(arch)
+          cod,nombrePelicula = lista[0],lista[1]
+          while cod != " ":
+                    dic[cod] = nombrePelicula
+                    lista=leer_archivo_binario(arch)
+                    cod,nombrePelicula = lista[0],lista[1]
+
+          return dic
+
+def convertir(dic):
+          aux=[]
+          dicAux={}
+          for clave in dic:
+                    campo=[clave,dic[clave]]
+                    aux.append(campo)
+                    
+          aux.sort(key=lambda x:x[1],reverse=True)
+          
+          for campo in aux:
+                    dicAux[campo[0]]=campo[1]
+                    
+          return dicAux
+                    
+          
+def peliculasVistas(dic):
+          aux={}
+          arch=open("usuario_maestro.bin","r")
+          id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+          lista=peliculas.split(";")
+
+          while id !='end':
+                    for cod in lista:
+                              nombrePeli =dic[cod]
+                              if nombrePeli not in aux:
+                                        aux[nombrePeli]= 1
+                              else:
+                                        aux[nombrePeli] += 1
+                    id,nombre,fecha,peliculas,estado = leer_usuario(arch)
+                    lista=peliculas.split(";")
+          aux=convertir(aux)
+          return aux
+
+def recomendarPelis(peliculas,pelisVistas,dic):
+          lista=peliculas.split(";")
+          ultimo=lista[-1]
+          ultimo=dic[ultimo]
+          cant=pelisVistas[ultimo]
+
+          for clave in pelisVistas:
+                    if pelisVistas[clave] <= cant:
+                              return clave,pelisVistas[clave]
+                    
+def recomendar_pelicula():
+          dic=puntoFinal()
+          pelisVistas=peliculasVistas(dic)
+          user=input("Ingrese Nomre de Usuario : ")
+          pos,id,nombre,fecha,peliculas=buscar_posicion(user)
+          nombrePeli,cant= recomendarPelis(peliculas,pelisVistas,dic)
+          print("La Recomendacion es ''{}'' que fue vistas {} veces.".format(nombrePeli,cant))
+          enter=input("Enter para continuar ....")
+          sub_menu_recomendaciones()
+          
+ ################################################
 def filtrar_x_genero(genero, lista):
     peli_v = []
     for elemento in lista:
@@ -428,60 +495,6 @@ def top_x_genero():
     pelis_x_genero.sort(key=lambda x :x[4], reverse=True)
     top_5(pelis_x_genero, genero_ingresado)
 
-
-def recomendar_pelicula():
-    nombre = input("Ingrese el nombre de usuario: ")
-    pos, id, nombre, fecha, peliculas, estado = buscar_posicion(nombre)
-    lista_p = peliculas.split(";")
-    dic_v = peliculas_vistas()
-    filtrar(lista_p, dic_v)
-    lista_recomendada = sorted(dic_v.items(), key=lambda x:x[1], reverse= True)
-    peli_a_recomendar = lista_recomendada[0]
-    dic = leer_pelis()
-    peli_recomendada(peli_a_recomendar,dic)
-
-def peli_recomendada(peli, dic):
-    for pelicula in dic:
-        if peli[0] == pelicula['id']:
-            print("La pelicula recomendada es {}, vista {} veces".format(pelicula['titulo'],peli[1]))
-
-def filtrar(lista_p,dic_v):
-    for cod in lista_p:
-        del dic_v[cod]
-
-def leer_pelis():
-    lista = []
-    arch = open("archivo_peliculas.bin", "rb")
-    seguir = True
-    while seguir:
-        try:
-            elem = pickle.load(arch)
-            lista.append({'id': elem[0], 'titulo': elem[1], 'director': elem[2], 'genero': elem[3], 'puntaje': elem[4]})
-        except EOFError:
-            seguir = False
-    return lista
-
-
-def peliculas_vistas():
-    aux = {}
-    arch = open("usuario_maestro.bin", "r")
-    id, nombre, fecha, peliculas, estado = leer_usuario(arch)
-    lista = peliculas.split(";")
-    while id != 'end':
-        dic_vistas(aux,lista)
-        id, nombre, fecha, peliculas, estado = leer_usuario(arch)
-        lista = peliculas.split(";")
-    return aux
-
-
-def dic_vistas(aux, lista):
-    for cod in lista:
-        if cod not in aux:
-            aux[cod] = 1
-        else:
-            aux[cod] += 1
-          
-          
 ########### SUB MENU RECOMENDACIONES ########
 def sub_menu_recomendaciones():
           palabra="Sub Menu Recomendaciones."
