@@ -199,7 +199,7 @@ def verifico(cod_peli, pelicula, lista):
 
 
 def asignar_pelicula():
-    usuario = input("Ingrese nombre de usuario: ")
+    usuario = input("Ingrese nombre de usuario: ").lower()
     pos, id, nombre, fecha, peliculas, estado = Usuarios.buscar_usu(usuario)
     lista = []
     seguir = "s"

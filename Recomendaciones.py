@@ -2,28 +2,31 @@ import Peliculas
 import Usuarios
 import pickle
 
+
 def filtrar_x_genero(genero, lista):
     peli_v = []
     for elemento in lista:
         if elemento[3] == genero:
-                peli_v.append(elemento)
+            peli_v.append(elemento)
     return peli_v
+
 
 def top_5(peli_v, genero):
     print("Top por {}: ".format(genero))
     for pelicula in peli_v:
         if len(peli_v) <= 5:
-            print(pelicula[1],pelicula[3],pelicula[4])
+            print(pelicula[1], pelicula[3], pelicula[4])
         else:
             print(pelicula)
             if pelicula == 5:
                 return
 
+
 def top_x_genero():
     lista = Peliculas.carga_lista()
     genero_ingresado = input("Ingresar genero: ")
     pelis_x_genero = filtrar_x_genero(genero_ingresado, lista)
-    pelis_x_genero.sort(key=lambda x :x[4], reverse=True)
+    pelis_x_genero.sort(key=lambda x: x[4], reverse=True)
     top_5(pelis_x_genero, genero_ingresado)
 
 
@@ -33,19 +36,22 @@ def recomendar_pelicula():
     lista_p = peliculas.split(";")
     dic_v = peliculas_vistas()
     filtrar(lista_p, dic_v)
-    lista_recomendada = sorted(dic_v.items(), key=lambda x:x[1], reverse= True)
+    lista_recomendada = sorted(dic_v.items(), key=lambda x: x[1], reverse=True)
     peli_a_recomendar = lista_recomendada[0]
     dic = leer_pelis()
-    peli_recomendada(peli_a_recomendar,dic)
+    peli_recomendada(peli_a_recomendar, dic)
+
 
 def peli_recomendada(peli, dic):
     for pelicula in dic:
         if peli[0] == pelicula['id']:
-            print("La pelicula recomendada es {}, vista {} veces".format(pelicula['titulo'],peli[1]))
+            print("La pelicula recomendada es {}, vista {} veces".format(pelicula['titulo'], peli[1]))
 
-def filtrar(lista_p,dic_v):
+
+def filtrar(lista_p, dic_v):
     for cod in lista_p:
         del dic_v[cod]
+
 
 def leer_pelis():
     lista = []
@@ -66,7 +72,7 @@ def peliculas_vistas():
     id, nombre, fecha, peliculas, estado = Usuarios.leer_usuario(arch)
     lista = peliculas.split(";")
     while id != 'end':
-        dic_vistas(aux,lista)
+        dic_vistas(aux, lista)
         id, nombre, fecha, peliculas, estado = Usuarios.leer_usuario(arch)
         lista = peliculas.split(";")
     return aux

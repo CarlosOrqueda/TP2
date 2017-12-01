@@ -89,18 +89,26 @@ def alta_usu():
     enter = input("Enter para continuar...")
     arch.close()
 
+# egbusquin@gmail.com mandenme el nombre del grupo y los integrantes
+# busqueda de usuario inexistente y menu sin recursividad
+# acotar el top 5 a 5
 
 def buscar_usu(usu_buscado):
     arch = open("usuario_maestro.bin", "r")
     id, nombre, fecha, peliculas, estado = leer_usuario(arch)
+    #pos = arch.tell()
+    #and id != "end
     while nombre != usu_buscado:
         pos = arch.tell()
         id, nombre, fecha, peliculas, estado = leer_usuario(arch)
+        #pos = arch.tell()
+    #if id == "end":
+        #pos = -1
     arch.close()
     return pos, id, nombre, fecha, peliculas, estado
 
 
-def formarLista():  # Agrege
+def formarLista():
     lista = []
     arch = open("usuario_maestro.bin", "r")
     id, nombre, fecha, peliculas, estado = leer_usuario(arch)
@@ -116,19 +124,18 @@ def baja_usu():
     buscado = input('Ingrese nombre: ')
     if buscado in listaNombres:
         baja = 'b'
-        pos, id, nombre, fecha, peliculas = buscar_usu(buscado)
+        pos, id, nombre, fecha, peliculas, estado = buscar_usu(buscado)
         arch = open("usuario_maestro.bin", "r+")
         arch.seek(pos)
-        grabar_usu(arch, id, nombre, fecha, peliculas, 'b')
+        grabar_usu(arch, id, nombre, fecha, peliculas, baja)
         print("Usuarios dado de Baja Satisfactoriamente.")
         enter = input("Enter para continuar ...")
         arch.close()
         return
     else:
-        print("Nombre se encuentra en nuestra Base de datos.")
+        print("El nombre no se encuentra en nuestra Base de datos.")
         enter = input("Enter para continuar ...")
         baja_usu()
-
 
 def listado_usu():
     arch = open("usuario_maestro.bin", "r")
