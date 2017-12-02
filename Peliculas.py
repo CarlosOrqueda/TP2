@@ -39,6 +39,7 @@ def crear_id_peli():
 #Acceso entre usuario y aplicacion, solicita los datos para la carga de pelicula
 def datos_peli():
     id_pelicula = crear_id_peli()
+    titulo=""; director="";genero=""; puntaje=""
     while titulo=="" and director=="" and genero=="" and puntaje=="":
         print("No deje ningun campo vacio.")
         titulo = input("Titulo: ")
