@@ -15,7 +15,6 @@ def ultimo_id():
     arch.close()
     return id
 
-
 def crear_id_peli():
     id = ultimo_id()
     num = int(id[2:5])
@@ -37,17 +36,19 @@ def crear_id_peli():
     id_pelicula = letra + str(num).zfill(3)
     return id_pelicula
 
-
+#Acceso entre usuario y aplicacion, solicita los datos para la carga de pelicula
 def datos_peli():
     id_pelicula = crear_id_peli()
-    titulo = input("Titulo: ")
-    director = input("Director: ")
-    genero = input("Genero: ")
-    puntaje = input("Puntaje: ")
+    while titulo=="" and director=="" and genero=="" and puntaje=="":
+        print("No deje ningun campo vacio.")
+        titulo = input("Titulo: ")
+        director = input("Director: ")
+        genero = input("Genero: ")
+        puntaje = input("Puntaje: ")
     pelicula = [id_pelicula, titulo, director, genero, puntaje]
     return pelicula
 
-
+#Funcion del sub menu peliculas, carga los datos al archivo peliculas
 def alta_peli():
     arch = open("archivo_peliculas.bin", "rb+")
     arch.seek(0, 2)
@@ -55,7 +56,7 @@ def alta_peli():
     pickle.dump(lista, arch)
     arch.close()
     print("Pelicula cargada correctamente.")
-    enter = input("Enter para continuar ...")
+    input("Enter para continuar ...")
 
 
 def cargar_archivo(dic):
@@ -78,7 +79,7 @@ def mostrar_peliculas():
             print(elem[0].ljust(10), elem[1], end='\n')
     arch.close()
 
-
+#Funcion sub menu peliculas.
 def baja_peli():
     dic = {}
     file1 = open("archivo_peliculas.bin", "rb")
@@ -91,12 +92,12 @@ def baja_peli():
             seguir = False
     file1.close()
     mostrar_peliculas()
-
     codigo_pelicula = input("ingrese el codigo de la pelicula a dar de baja: ")
+    while codigo_pelicula=="":
+        codigo_pelicula = input("ingrese el codigo de la pelicula a dar de baja: ")
     del dic[codigo_pelicula]
-
     cargar_archivo(dic)
-    enter = input("Enter para continuar ...")
+    input("Enter para continuar ...")
 
 
 def cargar_lista():
@@ -111,9 +112,7 @@ def cargar_lista():
             seguir = False
     return lista
 
-
 def carga_lista():
-
     lista = []
     file1 = open("archivo_peliculas.bin", "rb")
     seguir = True
@@ -138,7 +137,6 @@ def pelicula_por_puntaje():
     mostrar_lista(lista)
     enter = input("Enter para continuar ...")
 
-
 def leer_archivo_binario(file_film):
     try:
         lista = pickle.load(file_film)
@@ -146,7 +144,6 @@ def leer_archivo_binario(file_film):
     except EOFError:
         lista = [" ", " ", " ", " ", 0]
         return lista
-
 
 def mostrar_lista_cortedecontrol():
     with open("archivo_peliculas_aux.bin", "rb") as file_film:
@@ -181,12 +178,12 @@ def carga_lista_archivo(lista):
 
 
 def pelis_por_genero():
-    print("Pomedio Genero/Director")
+    print("Promedio Genero/Director")
     lista = carga_lista()
     lista.sort(key=lambda x: (x[3], x[2]))
     carga_lista_archivo(lista)
     mostrar_lista_cortedecontrol()
-    enter = input("Enter para continuar ...")
+    input("Enter para continuar ...")
 
 
 def verifico(cod_peli, pelicula, lista):
@@ -200,7 +197,12 @@ def verifico(cod_peli, pelicula, lista):
 
 def asignar_pelicula():
     usuario = input("Ingrese nombre de usuario: ").lower()
-    pos, id, nombre, fecha, peliculas, estado = Usuarios.buscar_usu(usuario)
+    lista=Usuarios.formarLista()
+    if usuario in lista:
+        pos, id, nombre, fecha, peliculas, estado = Usuarios.buscar_usu(usuario)
+    else:
+        print("Usuario incorrecto...")
+        usuario = input("Ingrese nombre de usuario: ").lower()
     lista = []
     seguir = "s"
     mostrar_peliculas()

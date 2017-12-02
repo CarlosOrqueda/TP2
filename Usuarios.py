@@ -1,3 +1,8 @@
+# egbusquin@gmail.com mandenme el nombre del grupo y los integrantes
+# busqueda de usuario inexistente y menu sin recursividad
+# acotar el top 5 a 5
+
+
 def leer_linea(arch, default):
     linea = arch.readline()
     return linea if linea else default
@@ -8,10 +13,51 @@ def leer_usuario(arch):
     id, nombre, fecha, peliculas, estado = linea.strip().split(",")
     return id, nombre, fecha, peliculas, estado
 
+#Devuelve un diccionario de usuarios y fecha de nacimiento
+def auxiliar_diccionario():
+    maestro=open("usuario_maestro.bin", "r+")
+    usuarios={}
+    id, usuario, fecha, peliculas, estado=leer_usuario(maestro)
+    while id!="end":
+        usuarios[usuario]=fecha
+        id, usuario, fecha, peliculas, estado=leer_usuario(maestro)
+    maestro.close()
+    return usuarios
+
+#Ingresa usuario y fecha de nacimiento a grabar, verifica si estan en archivo y devuelve un valor booleano.
+def existe_usuario(nombre, fecha):
+    usuarios=auxiliar_diccionario()
+    if nombre in usuarios and fecha in usuarios.values():
+        return True
+    else:
+        return False
 
 def grabar_usu(arch, id, nombre, fecha, peliculas, estado):
     arch.write(id + ',' + nombre + ',' + fecha + ',' + peliculas + ',' + estado + '\n')
 
+def grabarError(arch, nombre, dato1, dato2):
+    lista = dato1.split(";")
+    aux = dato2.split(";")
+    for campo in aux:
+        if campo not in aux:
+            lista.append(aux)
+    unir = ';'
+    pelis = unir.join(lista)
+    arch.write(nombre + ',' + pelis + '\n')
+
+
+def verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3):
+    errores = open("long.txt", "r+")
+    if nombre1 == nombre2:
+        if fecha1 != fecha2:
+            grabarError(errores, nombre1, peliculas1, peliculas2)
+    elif nombre2 == nombre3:
+        if fecha2 != fecha3:
+            grabarError(errores, nombre2, peliculas2, peliculas3)
+    elif nombre3 == nombre1:
+        if fecha3 != fecha2:
+            grabarError(errores, nombre3, peliculas3, peliculas1)
+        
 
 def merge():
     usu1 = open("usuarios1.csv", "r")
@@ -30,12 +76,15 @@ def merge():
         if id1 == menor:
             grabar_usu(usu_m, id1, nombre1, fecha1, peliculas1, estado1)
             id1, nombre1, fecha1, peliculas1, estado1 = leer_usuario(usu1)
+            verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3)
         elif id2 == menor:
             grabar_usu(usu_m, id2, nombre2, fecha2, peliculas2, estado2)
             id2, nombre2, fecha2, peliculas2, estado2 = leer_usuario(usu2)
+            verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3)
         else:
             grabar_usu(usu_m, id3, nombre3, fecha3, peliculas3, estado3)
             id3, nombre3, fecha3, peliculas3, estado3 = leer_usuario(usu3)
+            verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3)
     print("Archivo unificado correctamente")
     enter = input("Presione Enter para continuar...")
     usu_m.close()
@@ -74,40 +123,41 @@ def crear_id():
 
     return nuevo_id
 
-
+#Da el alta un usuario por verificacion de nombre y fecha en base de datos, si ya existe lo da de alta.
 def alta_usu():
-    id = crear_id()
     arch = open("usuario_maestro.bin", "r+")
     arch.seek(0, 2)
-    nombre = input("Nombre y Apellido: ").lower()
-    fecha = input("Fecha de nacimiento ddmmaaaa: ")
     peliculas = " "
     estado = "a"
-    grabar_usu(arch, id, nombre, fecha, peliculas, estado)
-    print("Su id es: ",id)
-    print("Usuario dado de alta satisfactoriamente.")
+    nombre = input("Nombre y Apellido: ").lower()
+    fecha = input("Fecha de nacimiento ddmmaaaa: ")
+    while nombre=="" and fecha=="":
+        nombre = input("Nombre y Apellido: ").lower()
+        fecha = input("Fecha de nacimiento ddmmaaaa: ")
+    verificacion=existe_usuario(nombre, fecha)
+    if verificacion:
+        pos, id, nombre, fecha, peliculas,estado =buscar_usu(nombre)
+        arch.seek(pos)
+        grabar_usu(arch, id, nombre, fecha, peliculas, estado)
+        print("El usuario que ingresó ya se encuentra en sistema...Se cambio el estado a alta.")
+    else:
+        id = crear_id()
+        grabar_usu(arch, id, nombre, fecha, peliculas, estado)
+        print("Su id es: ",id)
+        print("Usuario dado de alta satisfactoriamente.")
     enter = input("Enter para continuar...")
     arch.close()
-
-# egbusquin@gmail.com mandenme el nombre del grupo y los integrantes
-# busqueda de usuario inexistente y menu sin recursividad
-# acotar el top 5 a 5
-
+#Busca el usuario por nombre, devuelve la info del mismo
 def buscar_usu(usu_buscado):
     arch = open("usuario_maestro.bin", "r")
     id, nombre, fecha, peliculas, estado = leer_usuario(arch)
-    #pos = arch.tell()
-    #and id != "end
     while nombre != usu_buscado:
         pos = arch.tell()
         id, nombre, fecha, peliculas, estado = leer_usuario(arch)
-        #pos = arch.tell()
-    #if id == "end":
-        #pos = -1
     arch.close()
     return pos, id, nombre, fecha, peliculas, estado
 
-
+#Devuelve una lista de usuarios
 def formarLista():
     lista = []
     arch = open("usuario_maestro.bin", "r")
@@ -117,8 +167,7 @@ def formarLista():
         id, nombre, fecha, peliculas, estado = leer_usuario(arch)
     arch.close()
     return lista
-
-
+#Funcion del submenu usuarios, busca la posicion del usuario y da la baja.
 def baja_usu():
     listaNombres = formarLista()
     buscado = input('Ingrese nombre: ')
@@ -128,14 +177,14 @@ def baja_usu():
         arch = open("usuario_maestro.bin", "r+")
         arch.seek(pos)
         grabar_usu(arch, id, nombre, fecha, peliculas, baja)
-        print("Usuarios dado de Baja Satisfactoriamente.")
+        print("Usuario dado de Baja Satisfactoriamente.")
         enter = input("Enter para continuar ...")
         arch.close()
         return
     else:
         print("El nombre no se encuentra en nuestra Base de datos.")
         enter = input("Enter para continuar ...")
-        baja_usu()
+        #baja_usu()
 
 def listado_usu():
     arch = open("usuario_maestro.bin", "r")
@@ -158,16 +207,3 @@ def grabarError(arch, nombre, dato1, dato2):
     arch.write(nombre + ',' + pelis + '\n')
 
 
-def verificarDatos(nombre1, fecha1, peliculas1, nombre2, fecha2, peliculas2, nombre3, fecha3, peliculas3):
-    errores = open("long.txt", "r+")
-    if nombre1 == nombre2:
-        if fecha1 != fecha2:
-            grabarError(errores, nombre1, peliculas1, peliculas2)
-
-    elif nombre2 == nombre3:
-        if fecha2 != fecha3:
-            grabarError(errores, nombre2, peliculas2, peliculas3)
-
-    elif nombre3 == nombre1:
-        if fecha3 != fecha2:
-            grabarError(errores, nombre3, peliculas3, peliculas1)
